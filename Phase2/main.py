@@ -1,26 +1,54 @@
-def nfa_initialization(json_path):
-    nfa = json.load(open(json_path))
-
-    nfa_states = [state[1: -1] for state in nfa['states'][1: -1].split(',')]
-    nfa_alphabets = [alphabet[1: -1] for alphabet in nfa['input_symbols'][1: -1].split(',')]
-
-    nfa_transitions = {}
-    for key in nfa['transitions']:
-        for k in nfa['transitions'][key].keys():
-            result_states = [s[1: -1] for s in nfa['transitions'][key][k][1: -1].split(',')]
-            for result_state in result_states:
-                if (key, k) not in nfa_transitions:
-                    nfa_transitions[(key, k)] = [result_state]
-                else:
-                    nfa_transitions[(key, k)].append(result_state)
-
-    nfa_initial_state = nfa['initial_state']
-    nfa_final_states = [state[1: -1] for state in nfa['final_states'][1: -1].split(',')]
-
-    return nfa_states, nfa_alphabets, nfa_transitions, nfa_initial_state, nfa_final_states
+import json
+import sys
 
 
-def output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_alphabets):
+def dfa_initialization():
+    # dfa = json.load(open(json_path))
+
+    dfa = {
+        "states": "{'q0','q1','q2','q3','q4'}",
+        "input_symbols": "{'0','1'}",
+        "transitions": {
+            "q0": {
+                "0": "q1",
+                "1": "q3"
+            },
+            "q1": {
+                "0": "q2",
+                "1": "q4"
+            },
+            "q2": {
+                "0": "q1",
+                "1": "q4"
+            },
+            "q3": {
+                "0": "q2",
+                "1": "q4"
+            },
+            "q4": {
+                "0": "q4",
+                "1": "q4"
+            }
+        },
+        "initial_state": "q0",
+        "final_states": "{'q4'}"
+    }
+
+    dfa_states = [state[1: -1] for state in dfa['states'][1: -1].split(',')]
+    dfa_alphabets = [alphabet[1: -1] for alphabet in dfa['input_symbols'][1: -1].split(',')]
+
+    dfa_transitions = {}
+    for key in dfa['transitions']:
+        for k in dfa['transitions'][key].keys():
+            dfa_transitions[(key, k)] = dfa['transitions'][key][k]
+
+    dfa_initial_state = dfa['initial_state']
+    dfa_final_states = [state[1: -1] for state in dfa['final_states'][1: -1].split(',')]
+
+    return dfa_states, dfa_alphabets, dfa_transitions, dfa_initial_state, dfa_final_states
+
+
+def output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_alphabets, nfa_initial_state):
     output = {}
 
     output_states = '{'
@@ -113,4 +141,6 @@ def output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_a
 
 
 if __name__ == '__main__':
-    pass
+    # args = sys.argv[1:]
+    # json_path = args[0]
+    dfa_states, dfa_alphabets, dfa_transitions, dfa_initial_state, dfa_final_states = dfa_initialization()
