@@ -61,41 +61,40 @@ def nfa_initialization(json_path):
 
 
 if __name__ == '__main__':
-    # args = sys.argv[1:]
-    # json_path = args[0]
-    # nfa = json.load(open(json_path))
+    args = sys.argv[1:]
+    json_path = args[0]
+    nfa = json.load(open(json_path))
 
-    nfa = {
-        "states": "{'q0','q1','q2','q3','q4'}",
-        "input_symbols": "{'a','b'}",
-        "transitions": {
-            "q0": {
-                "a": "{'q1'}"
-            },
-            "q1": {
-                "": "{'q3'}",
-                "b": "{'q2'}"
-            },
-            "q2": {
-                "a": "{'q3'}"
-            },
-            "q3": {
-                "b": "{'q4'}"
-            },
-            "q4": {
-                "a": "{'q2'}"
-            }
-        },
-        "initial_state": "q0",
-        "final_states": "{'q1','q3'}"
-    }
+    # nfa = {
+    #     "states": "{'q0','q1','q2','q3','q4'}",
+    #     "input_symbols": "{'a','b'}",
+    #     "transitions": {
+    #         "q0": {
+    #             "a": "{'q1'}"
+    #         },
+    #         "q1": {
+    #             "": "{'q3'}",
+    #             "b": "{'q2'}"
+    #         },
+    #         "q2": {
+    #             "a": "{'q3'}"
+    #         },
+    #         "q3": {
+    #             "b": "{'q4'}"
+    #         },
+    #         "q4": {
+    #             "a": "{'q2'}"
+    #         }
+    #     },
+    #     "initial_state": "q0",
+    #     "final_states": "{'q1','q3'}"
+    # }
 
     nfa_states = [state[1: -1] for state in nfa['states'][1: -1].split(',')]
     nfa_alphabets = [alphabet[1: -1] for alphabet in nfa['input_symbols'][1: -1].split(',')]
 
     nfa_transitions = {}
     for key in nfa['transitions']:
-        print(nfa['transitions'][key].keys())
         for k in nfa['transitions'][key].keys():
             result_states = [s[1: -1] for s in nfa['transitions'][key][k][1: -1].split(',')]
             for result_state in result_states:
@@ -159,7 +158,6 @@ if __name__ == '__main__':
 
     new_dfa_transitions = {}
     for key in dfa_transitions.keys():
-        print(key)
         string_state = ''
         for state in key[0]:
             string_state = string_state + state
