@@ -1,61 +1,3 @@
-import json
-import sys
-
-
-def find_lambda_transitions(state):
-    result = []
-    if nfa_transitions.get((state, '')):
-        for lambda_transition in nfa_transitions[(state, '')]:
-            if lambda_transition not in result:
-                result.append(lambda_transition)
-
-    for item in result:
-        lambda_states = find_lambda_transitions(item)
-        for lambda_state in lambda_states:
-            result.append(lambda_state)
-
-    return result
-
-
-def transition_states(state, alphabet, result):
-    if nfa_transitions.get((state, alphabet)):
-        for transition_state in nfa_transitions[(state, alphabet)]:
-            if transition_state not in result:
-                result.append(transition_state)
-
-    lambda_transitions = result.copy()
-    for s in lambda_transitions:
-        lambda_states = find_lambda_transitions(s)
-        for lambda_state in lambda_states:
-            if lambda_state not in result:
-                result.append(lambda_state)
-
-    lambda_states = find_lambda_transitions(state)
-    for item in lambda_states:
-        transition_states(item, alphabet, result)
-
-    return result
-
-
-def find_new_states(current_state):
-    for nfa_alphabet in nfa_alphabets:
-        resulting_states = []
-        for state in current_state:
-            result = transition_states(state, nfa_alphabet, [])
-            for item in result:
-                if item not in resulting_states:
-                    resulting_states.append(item)
-
-        resulting_states = sorted(resulting_states)
-
-        dfa_transitions[(tuple(current_state), nfa_alphabet)] = resulting_states
-        if resulting_states not in dfa_states:
-            dfa_states.append(resulting_states)
-
-            if len(resulting_states) > 0:
-                new_states.append(resulting_states)
-
-
 def nfa_initialization(json_path):
     nfa = json.load(open(json_path))
 
@@ -78,7 +20,7 @@ def nfa_initialization(json_path):
     return nfa_states, nfa_alphabets, nfa_transitions, nfa_initial_state, nfa_final_states
 
 
-def output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_alphabets, nfa_initial_state):
+def output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_alphabets):
     output = {}
 
     output_states = '{'
@@ -171,27 +113,4 @@ def output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_a
 
 
 if __name__ == '__main__':
-    args = sys.argv[1:]
-    json_path = args[0]
-
-    nfa_states, nfa_alphabets, nfa_transitions, nfa_initial_state, nfa_final_states = nfa_initialization(json_path)
-
-    dfa_initial_state = [nfa_initial_state]
-    dfa_states = [dfa_initial_state]
-    dfa_transitions = {}
-    dfa_final_states = []
-    new_states = [dfa_initial_state]
-
-    for start_state in new_states:
-        find_new_states(start_state)
-
-    for state in dfa_states:
-        for final_state in nfa_final_states:
-            if final_state in state:
-                dfa_final_states.append(state)
-                break
-
-    generated_dfa = output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_alphabets, nfa_initial_state)
-
-    with open('out.json', 'w') as f:
-        json.dump(generated_dfa, f)
+    pass
