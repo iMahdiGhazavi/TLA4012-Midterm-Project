@@ -57,38 +57,7 @@ def find_new_states(current_state):
 
 
 def nfa_initialization(json_path):
-    pass
-
-
-if __name__ == '__main__':
-    args = sys.argv[1:]
-    json_path = args[0]
     nfa = json.load(open(json_path))
-
-    # nfa = {
-    #     "states": "{'q0','q1','q2','q3','q4'}",
-    #     "input_symbols": "{'a','b'}",
-    #     "transitions": {
-    #         "q0": {
-    #             "a": "{'q1'}"
-    #         },
-    #         "q1": {
-    #             "": "{'q3'}",
-    #             "b": "{'q2'}"
-    #         },
-    #         "q2": {
-    #             "a": "{'q3'}"
-    #         },
-    #         "q3": {
-    #             "b": "{'q4'}"
-    #         },
-    #         "q4": {
-    #             "a": "{'q2'}"
-    #         }
-    #     },
-    #     "initial_state": "q0",
-    #     "final_states": "{'q1','q3'}"
-    # }
 
     nfa_states = [state[1: -1] for state in nfa['states'][1: -1].split(',')]
     nfa_alphabets = [alphabet[1: -1] for alphabet in nfa['input_symbols'][1: -1].split(',')]
@@ -106,21 +75,10 @@ if __name__ == '__main__':
     nfa_initial_state = nfa['initial_state']
     nfa_final_states = [state[1: -1] for state in nfa['final_states'][1: -1].split(',')]
 
-    dfa_initial_state = [nfa_initial_state]
-    dfa_states = [dfa_initial_state]
-    dfa_transitions = {}
-    new_states = [dfa_initial_state]
-    dfa_final_states = []
+    return nfa_states, nfa_alphabets, nfa_transitions, nfa_initial_state, nfa_final_states
 
-    for start_state in new_states:
-        find_new_states(start_state)
 
-    for state in dfa_states:
-        for final_state in nfa_final_states:
-            if final_state in state:
-                dfa_final_states.append(state)
-                break
-
+def output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_alphabets):
     output = {}
 
     output_states = '{'
@@ -139,7 +97,6 @@ if __name__ == '__main__':
     output_states = output_states + '}'
     output['states'] = output_states
 
-    output_symbols = {}
     alphabet = '{'
     for i in range(len(nfa_alphabets)):
         alphabet = alphabet + f"'{nfa_alphabets[i]}'"
@@ -210,5 +167,31 @@ if __name__ == '__main__':
     output_final_states = output_final_states + '}'
     output['final_states'] = output_final_states
 
+    return output
+
+
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    json_path = args[0]
+
+    nfa_states, nfa_alphabets, nfa_transitions, nfa_initial_state, nfa_final_states = nfa_initialization(json_path)
+
+    dfa_initial_state = [nfa_initial_state]
+    dfa_states = [dfa_initial_state]
+    dfa_transitions = {}
+    dfa_final_states = []
+    new_states = [dfa_initial_state]
+
+    for start_state in new_states:
+        find_new_states(start_state)
+
+    for state in dfa_states:
+        for final_state in nfa_final_states:
+            if final_state in state:
+                dfa_final_states.append(state)
+                break
+
+    generated_dfa = output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_alphabets)
+
     with open('out.json', 'w') as f:
-        json.dump(output, f)
+        json.dump(generated_dfa, f)
