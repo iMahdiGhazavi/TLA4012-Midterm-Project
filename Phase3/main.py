@@ -1,4 +1,7 @@
+import sys
+import json
 from typing import List, Tuple, Set
+
 
 def set_of_reachables(transitions: List[Tuple[str, str, str]], state: str, alphabet: str) -> Set[str]:
     next_states = set()
@@ -31,23 +34,25 @@ def final_check(in_str: str, alphabets: List[str], final_states: List[str], init
         return True
 
     
-def Finite_automata():
-    Fa = {
-        "states": "{'A','B'}",
-        "input_symbols": "{'a','b'}",
-        "transitions": {
-            "A": {
-                "a": "B",
-                "b": "A"
-            },
-            "B": {
-                "a": "B",
-                "b": "B"
-            }
-        },
-        "initial_state": "A",
-        "final_states": "{'B'}"
-    }
+def Finite_automata(json_path):
+    Fa = json.load(open(json_path))
+
+    # Fa = {
+    #     "states": "{'A','B'}",
+    #     "input_symbols": "{'a','b'}",
+    #     "transitions": {
+    #         "A": {
+    #             "a": "B",
+    #             "b": "A"
+    #         },
+    #         "B": {
+    #             "a": "B",
+    #             "b": "B"
+    #         }
+    #     },
+    #     "initial_state": "A",
+    #     "final_states": "{'B'}"
+    # }
     Fa_states = ''
     for i in range(len(Fa['states'][1: -1].split(','))):
         Fa_states = Fa_states + Fa['states'][1: -1].split(',')[i][1: -1]
@@ -80,6 +85,10 @@ def Finite_automata():
     return Fa_states, Fa_alphabets, Fa_transitions, Fa_initial_state, Fa_final_states
 
 if __name__ == '__main__':
+
+    args = sys.argv[1:]
+    json_path = args[0]
+    
     Fa_states, Fa_alphabets, Fa_transitions, Fa_initial_state, Fa_final_states = Finite_automata()
     
     input_states=Fa_states
