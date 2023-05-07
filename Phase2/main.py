@@ -39,6 +39,29 @@ def divide_final_states(dfa_states, dfa_final_states, transition_table):
                 transition_table[i][j][0] = 1
 
 
+def are_equivalent(i, j, k, dfa_states, dfa_alphabets, dfa_transitions, transition_table):
+    for alphabet in dfa_alphabets:
+        state1 = dfa_transitions[(dfa_states[i], alphabet)]
+        state1_idx = dfa_states.index(state1)
+
+        state2 = dfa_transitions[(dfa_states[j], alphabet)]
+        state2_idx = dfa_states.index(state2)
+
+        if transition_table[state1_idx][state2_idx][k] == 0:
+            return False
+
+    return True
+
+
+def divide_equivalent_states(dfa_states, dfa_alphabets, dfa_transitions, transition_table):
+    for k in range(1, len(dfa_states) - 1):
+        for i in range(len(dfa_states)):
+            for j in range(len(dfa_states)):
+                if transition_table[i][j][k - 1] == 1 and are_equivalent(i, j, k - 1, dfa_states, dfa_alphabets,
+                                                                         dfa_transitions, transition_table):
+                    transition_table[i][j][k] = 1
+
+
 def dfa_initialization(json_path):
     dfa = json.load(open(json_path))
 
@@ -193,3 +216,4 @@ if __name__ == '__main__':
 
     divide_final_states(dfa_states, dfa_final_states, transition_table)
 
+    divide_equivalent_states(dfa_states, dfa_alphabets, dfa_transitions, transition_table)
