@@ -261,3 +261,8 @@ if __name__ == '__main__':
     sdfa_transitions = find_sdfa_transitions(sdfa_states, dfa_alphabets, dfa_transitions)
 
     sdfa_final_states = find_sdfa_final_states(sdfa_states, dfa_final_states)
+
+    sdfa = output_format_generator(sdfa_states, sdfa_transitions, sdfa_final_states, dfa_alphabets, dfa_initial_state)
+
+    with open('SDFA.json', 'w') as f:
+        json.dump(sdfa, f)
