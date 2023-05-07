@@ -30,6 +30,15 @@ def remove_non_reachable_states(dfa_states, reachable_states):
             dfa_states.remove(state)
 
 
+def divide_final_states(dfa_states, dfa_final_states, transition_table):
+    for i in range(len(dfa_states)):
+        for j in range(len(dfa_states)):
+            if dfa_states[i] in dfa_final_states and dfa_states[j] in dfa_final_states:
+                transition_table[i][j][0] = 1
+            elif dfa_states[i] not in dfa_final_states and dfa_states[j] not in dfa_final_states:
+                transition_table[i][j][0] = 1
+
+
 def dfa_initialization(json_path):
     dfa = json.load(open(json_path))
 
@@ -178,3 +187,9 @@ if __name__ == '__main__':
     }
     find_reachable_states(dfa_states[0], dfa_alphabets, dfa_transitions, reachable_states)
     remove_non_reachable_states(dfa_states, reachable_states)
+
+    transition_table = [[[0 for _ in range(len(dfa_states) - 1)] for _ in range(len(dfa_states))] for _ in
+                        range(len(dfa_states))]
+
+    divide_final_states(dfa_states, dfa_final_states, transition_table)
+
