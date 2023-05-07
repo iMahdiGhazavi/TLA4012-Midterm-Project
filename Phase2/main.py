@@ -2,37 +2,65 @@ import json
 import sys
 
 
-def dfa_initialization():
-    # dfa = json.load(open(json_path))
+def has_reachable_states(state, dfa_alphabets, dfa_transitions, reachable_states):
+    for alphabet in dfa_alphabets:
+        if dfa_transitions[(state, alphabet)] not in reachable_states:
+            return True
 
-    dfa = {
-        "states": "{'q0','q1','q2','q3','q4'}",
-        "input_symbols": "{'0','1'}",
-        "transitions": {
-            "q0": {
-                "0": "q1",
-                "1": "q3"
-            },
-            "q1": {
-                "0": "q2",
-                "1": "q4"
-            },
-            "q2": {
-                "0": "q1",
-                "1": "q4"
-            },
-            "q3": {
-                "0": "q2",
-                "1": "q4"
-            },
-            "q4": {
-                "0": "q4",
-                "1": "q4"
-            }
-        },
-        "initial_state": "q0",
-        "final_states": "{'q4'}"
-    }
+    return False
+
+
+def find_reachable_states(dfa_state, dfa_alphabets, dfa_transitions, reachable_states):
+    found_states = []
+    for alphabet in dfa_alphabets:
+        resulting_state = dfa_transitions[(dfa_state, alphabet)]
+        if resulting_state not in reachable_states:
+            reachable_states[resulting_state] = True
+            found_states.append(resulting_state)
+
+    for state in found_states:
+        if has_reachable_states(state, dfa_alphabets, dfa_transitions, reachable_states):
+            find_reachable_states(state, dfa_alphabets, dfa_transitions, reachable_states)
+
+
+def remove_non_reachable_states(dfa_states, reachable_states):
+    temp_states = dfa_states.copy()
+    for state in temp_states:
+        if state not in reachable_states:
+            dfa_states.remove(state)
+
+
+def dfa_initialization(json_path):
+    dfa = json.load(open(json_path))
+
+    # dfa = {
+    #     "states": "{'q0','q1','q2','q3','q4'}",
+    #     "input_symbols": "{'0','1'}",
+    #     "transitions": {
+    #         "q0": {
+    #             "0": "q1",
+    #             "1": "q3"
+    #         },
+    #         "q1": {
+    #             "0": "q2",
+    #             "1": "q4"
+    #         },
+    #         "q2": {
+    #             "0": "q1",
+    #             "1": "q4"
+    #         },
+    #         "q3": {
+    #             "0": "q2",
+    #             "1": "q4"
+    #         },
+    #         "q4": {
+    #             "0": "q4",
+    #             "1": "q4"
+    #         }
+    #     },
+    #     "initial_state": "q0",
+    #     "final_states": "{'q4'}"
+    # }
 
     dfa_states = [state[1: -1] for state in dfa['states'][1: -1].split(',')]
     dfa_alphabets = [alphabet[1: -1] for alphabet in dfa['input_symbols'][1: -1].split(',')]
@@ -141,6 +169,12 @@ def output_format_generator(dfa_states, dfa_transitions, dfa_final_states, nfa_a
 
 
 if __name__ == '__main__':
-    # args = sys.argv[1:]
-    # json_path = args[0]
-    dfa_states, dfa_alphabets, dfa_transitions, dfa_initial_state, dfa_final_states = dfa_initialization()
+    args = sys.argv[1:]
+    json_path = args[0]
+    dfa_states, dfa_alphabets, dfa_transitions, dfa_initial_state, dfa_final_states = dfa_initialization(json_path)
+
+    reachable_states = {
+        dfa_states[0]: True,
+    }
+    find_reachable_states(dfa_states[0], dfa_alphabets, dfa_transitions, reachable_states)
+    remove_non_reachable_states(dfa_states, reachable_states)
