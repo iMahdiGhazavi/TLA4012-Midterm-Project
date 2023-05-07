@@ -62,6 +62,44 @@ def divide_equivalent_states(dfa_states, dfa_alphabets, dfa_transitions, transit
                     transition_table[i][j][k] = 1
 
 
+def find_sdfa_states(dfa_states, transition_table):
+    visited_states = [0 for _ in range(len(dfa_states))]
+    sdfa_states = []
+    for i in range(len(dfa_states)):
+        if visited_states[i] == 1:
+            continue
+
+        visited_states[i] = 1
+        sdfa_states.append([dfa_states[i]])
+
+        for j in range(i + 1, len(dfa_states)):
+            if transition_table[i][j][len(dfa_states) - 2] == 1:
+                sdfa_states[-1].append(dfa_states[j])
+                visited_states[j] = 1
+
+    return sdfa_states
+
+
+def find_sdfa_transitions(sdfa_states, dfa_alphabets, dfa_transitions):
+    sdfa_transitions = {}
+    for start_state in sdfa_states:
+        for alphabet in dfa_alphabets:
+            for resulting_state in sdfa_states:
+                if dfa_transitions[(start_state[0], alphabet)] in resulting_state:
+                    sdfa_transitions[(tuple(start_state), alphabet)] = tuple(resulting_state)
+
+    return sdfa_transitions
+
+
+def find_sdfa_final_states(sdfa_states, dfa_final_states):
+    sdfa_final_states = []
+    for state in sdfa_states:
+        if state[0] in dfa_final_states:
+            sdfa_final_states.append(state)
+
+    return sdfa_final_states
+
+
 def dfa_initialization(json_path):
     dfa = json.load(open(json_path))
 
@@ -217,3 +255,9 @@ if __name__ == '__main__':
     divide_final_states(dfa_states, dfa_final_states, transition_table)
 
     divide_equivalent_states(dfa_states, dfa_alphabets, dfa_transitions, transition_table)
+
+    sdfa_states = find_sdfa_states(dfa_states, transition_table)
+
+    sdfa_transitions = find_sdfa_transitions(sdfa_states, dfa_alphabets, dfa_transitions)
+
+    sdfa_final_states = find_sdfa_final_states(sdfa_states, dfa_final_states)
